@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 import PIL
 from PIL import Image
 import os
@@ -74,10 +75,14 @@ def save_data(filename):
     np.save(os.path.join("trainingdata", filename + ".npy".format(filename)), data)
     print("Data has been saved in " + "trainingdata/" + filename)
 
+def to_hsv(image):
+    return cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
 if __name__ == '__main__':
     filename = input("Please specify the filename for the training data: ")
     image = Image.open("images/trebekthumb.jpg")
     resized_image = image.resize((100, 100))
     image_array = np.asarray(resized_image)
-    image_list.append(image_array)
+    HSV_array = to_hsv(image_array)
+    image_list.append(HSV_array)
     save_data(filename)
