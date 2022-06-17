@@ -1,4 +1,6 @@
 import torch
+import torch.nn as nn 
+#import torch.nn.functional as F
 from torch.utils.data import random_split
 import torchvision
 from torchvision.datasets import ImageFolder
@@ -71,3 +73,43 @@ if __name__ == "__main__":
             print("Epoch [{}], train_loss: {.4f}, val_loss: {.4f}, val_acc: {.4f}".format(epoch, result['train_loss'], result['val_loss'], result['val_acc']))
             
     print("Finished the class of nn")
+    
+        #might want to set padding to 0 in the CNN convolutions cause the background of our input doesn't give any information. 
+    class CnnModel(ImageClassBase):
+        def __init__(self):
+            super().__init__()
+            self.network = nn.Sequential(
+                nn.Conv2d(3, 100, kernel_size=3, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(100, 200, kernel_size=3, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(2, 2), # output: 200 x 50 x 50
+                
+                nn.Conv2d(200, 400, kernel_size=3, stride=1, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(400, 400, kernel_size=3, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(2, 2), # output: 400 x 25 x 25
+                
+                nn.Conv2d(400, 800, kernel_size=3, stride=1, padding=1),
+                nn.ReLU(),
+                nn.Conv2d(800, 800, kernel_size=3, stride=1, padding=1),
+                nn.ReLU(),
+                nn.MaxPool2d(2, 2), # output: 800 x 12 x 12
+
+                nn.Flatten(), 
+                nn.Linear(800*12*12, 1024),
+                nn.ReLU(),
+                nn.Linear(1024, 512),
+                nn.ReLU(),
+                nn.Linear(512, 131))
+            
+            def forward(self, xb):
+                return self.network(xb)
+    
+    Cnn_model = CnnModel()
+    
+    
+    num_epochs = 3
+    optim_func = torch.optim.Adam
+    lr = 0.001
